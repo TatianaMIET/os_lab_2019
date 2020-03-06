@@ -1,0 +1,3 @@
+/projects/TatianaMIET-os_lab_2019/lab1/src
+DATE 06/03/20
+/opt/rh/llvm-toolset-8.0/root/usr/bin:/opt/rh/llvm-toolset-8.0/root/usr/sbin:/opt/app-root/src/bin:/opt/app-root/bin:/usr/local/sbin:/usr/local/bin:/usr/sbin:/usr/bin:/sbin:/bin
