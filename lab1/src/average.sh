@@ -1,7 +1,12 @@
 #!/bin/bash
 
-wc -w $1
-
-i=0
 sum=0
-od -c $1
+
+for i in "$@"
+do 
+  sum=$((sum+i))
+done
+
+arg_count="$#"
+
+echo "$((sum/arg_count))"
