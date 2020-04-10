@@ -117,9 +117,11 @@ int main(int argc, char **argv) {
         min_max_pnum = GetMinMax(array, i*part_pnum, (i == pnum - 1) ? array_size : (i + 1)*part_pnum);
 
         if (with_files) {
-          // use files here
+          FILE* outFile = fopen("min_max_out.txt", "a");
+          fwrite(&min_max_pnum, sizeof(struct MinMax), 1, outFile);
+          fclose(outFile);
         } else {
-          // use pipe here
+          write(pipefd[1], &min_max_pnum, sizeof(struct MinMax));
         }
         return 0;
       }
