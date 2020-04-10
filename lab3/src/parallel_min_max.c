@@ -40,18 +40,24 @@ int main(int argc, char **argv) {
         switch (option_index) {
           case 0:
             seed = atoi(optarg);
-            // your code here
-            // error handling
+              if (seed <= 0) {
+                printf("seed is a positive number\n");
+                 return 1;
+                }
             break;
           case 1:
             array_size = atoi(optarg);
-            // your code here
-            // error handling
+             if (array_size <= 0) {
+                printf("array_size is a positive number\n");
+                 return 1;
+                }
             break;
           case 2:
             pnum = atoi(optarg);
-            // your code here
-            // error handling
+             if (pnum <= 0) {
+                printf("pnum is a positive number\n");
+                 return 1;
+                }
             break;
           case 3:
             with_files = true;
@@ -88,6 +94,15 @@ int main(int argc, char **argv) {
   GenerateArray(array, array_size, seed);
   int active_child_processes = 0;
 
+  int pipefd[2];
+  pid_t cpid;
+   if (pipe(pipefd) == -1) {
+               perror("pipe");
+               exit(EXIT_FAILURE);
+    }
+
+  struct MinMax min_max_pnum;
+  int part_pnum = array_size/pnum;
   struct timeval start_time;
   gettimeofday(&start_time, NULL);
 
@@ -99,7 +114,7 @@ int main(int argc, char **argv) {
       if (child_pid == 0) {
         // child process
 
-        // parallel somehow
+        min_max_pnum = GetMinMax(array, i*part_pnum, (i == pnum - 1) ? array_size : (i + 1)*part_pnum);
 
         if (with_files) {
           // use files here
