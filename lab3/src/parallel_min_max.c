@@ -133,7 +133,9 @@ int main(int argc, char **argv) {
   }
 
   while (active_child_processes > 0) {
-    // your code here
+    
+    close(pipefd[1]);
+    wait(NULL);
 
     active_child_processes -= 1;
   }
@@ -147,14 +149,21 @@ int main(int argc, char **argv) {
     int max = INT_MIN;
 
     if (with_files) {
-      // read from files
+        FILE* outFile = fopen("min_max_out.txt", "rb");
+        fseek(outFile, i*sizeof(struct MinMax), SEEK_SET);
+        fread(&min_max_pnum, sizeof(struct MinMax), 1, outFile);
+        fclose(outFile);
     } else {
-      // read from pipes
+        read(pipefd[0], &min_max_pnum, sizeof(struct MinMax));
     }
-
-    if (min < min_max.min) min_max.min = min;
-    if (max > min_max.max) min_max.max = max;
+    
+    
+    if (min_max_pnum.min < min_max.min)
+        min_max.min = min_max_pnum.min;
+    if (min_max_pnum.max > min_max.max) 
+        min_max.max = min_max_pnum.max;
   }
+  
 
   struct timeval finish_time;
   gettimeofday(&finish_time, NULL);
