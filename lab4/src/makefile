@@ -4,17 +4,20 @@ CFLAGS=-I.
 
 all : process_memory parallel_min_max
 
-parallel_min_max : utils.o find_min_max.o utils.h find_min_max.h
-	$(CC) -o parallel_min_max utils.o find_min_max.o parallel_min_max.c $(CFLAGS)
+parallel_min_max : utils.o find_min_max.o utils.h find_min_max.h parallel_min_max.o
+	$(CC) -o parallel_min_max utils.o find_min_max.o parallel_min_max.o
 
 process_memory : process_memory.c 
 	$(CC) -o process_memory process_memory.c
 
 utils.o : utils.h
-	$(CC) -o utils.o -c utils.c $(CFLAGS)
+	$(CC) -o utils.o -c -std=c99 utils.c $(CFLAGS)
 
 find_min_max.o : utils.h find_min_max.h
-	$(CC) -o find_min_max.o -c find_min_max.c $(CFLAGS)
+	$(CC) -o find_min_max.o -c -std=c99 find_min_max.c $(CFLAGS)
+
+parallel_min_max.o :  utils.h find_min_max.h
+	$(CC) -o parallel_min_max.o -c -std=c99 parallel_min_max.c $(CFLAGS)
 
 clean :
-	rm utils.o find_min_max.o parallel_min_max process_memory
+	rm utils.o find_min_max.o parallel_min_max.o parallel_min_max process_memory
