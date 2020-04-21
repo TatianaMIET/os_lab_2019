@@ -11,6 +11,7 @@
 #include <sys/wait.h>
 
 #include <getopt.h>
+#include <errno.h>
 
 #include "find_min_max.h"
 #include "utils.h"
@@ -154,12 +155,23 @@ int main(int argc, char **argv) {
         alarm (time_out);
     }
 
+
   while (active_child_processes > 0) {
 
     close(pipefd[1]);
-    wait(NULL);
 
-    active_child_processes -= 1;
+    int wpid = waitpid(-1, NULL, WNOHANG);
+
+        if(wpid == -1)
+        {
+            if(errno == ECHILD) break;
+        }
+        else
+        {
+            active_child_processes -= 1;
+        }
+        printf("%d\n", active_child_processes);
+
   }
 
   struct MinMax min_max;
