@@ -15,12 +15,10 @@
 #include "find_min_max.h"
 #include "utils.h"
 
-pid_t currentPID;
 void KillChild(int signum){
-    if (kill(currentPID, SIGKILL)==0)
-        printf ("child process was successfully killed");
-    else
-        printf ("error while killing a child process");
+
+    kill(-1, SIGKILL);
+    printf ("processes were successfully killed");
 }
 
 
@@ -119,7 +117,6 @@ int main(int argc, char **argv) {
                exit(EXIT_FAILURE);
     }
 
-  pid_t currentPID;
   struct MinMax min_max_pnum;
   int part_pnum = array_size/pnum;
   struct timeval start_time;
@@ -151,13 +148,13 @@ int main(int argc, char **argv) {
     }
   }
 
-  while (active_child_processes > 0) {
-
-    if (time_out > 0){
+  if (time_out > 0){
         
-        alarm (time_out);
         signal (SIGALRM, KillChild);
+        alarm (time_out);
     }
+
+  while (active_child_processes > 0) {
 
     close(pipefd[1]);
     wait(NULL);
