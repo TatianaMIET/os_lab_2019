@@ -20,6 +20,7 @@ int main(int argc, char **argv) {
   int array_size = -1;
   int pnum = -1;
   bool with_files = false;
+  int time_out = -1;
 
   while (true) {
     int current_optind = optind ? optind : 1;
@@ -28,6 +29,7 @@ int main(int argc, char **argv) {
                                       {"array_size", required_argument, 0, 0},
                                       {"pnum", required_argument, 0, 0},
                                       {"by_files", no_argument, 0, 'f'},
+                                      {"timeout", no_argument, 0, 0},
                                       {0, 0, 0, 0}};
 
     int option_index = 0;
@@ -61,6 +63,13 @@ int main(int argc, char **argv) {
             break;
           case 3:
             with_files = true;
+            break;
+          case 4:
+            time_out = atoi(optarg);
+                if (time_out <= -1) {
+                    printf("timeout is a positive number\n");
+                    return 1;
+                }
             break;
 
           defalut:
@@ -133,6 +142,8 @@ int main(int argc, char **argv) {
   }
 
   while (active_child_processes > 0) {
+
+      
     
     close(pipefd[1]);
     wait(NULL);
