@@ -115,6 +115,7 @@ int main(int argc, char **argv) {
   }
   
   struct timeval start_time;
+  gettimeofday(&start_time, NULL);
 
   for (uint32_t i = 0; i < threads_num; i++) {
     if (pthread_create(&threads[i], NULL, ThreadSum, (void *)&args[i])) {
