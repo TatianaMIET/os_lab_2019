@@ -106,9 +106,9 @@ int main(int argc, char **argv) {
   GenerateArray(array, array_size, seed);
 
   for (uint32_t i = 0; i < array_size; i++){
-      printf(" %i ", array[i]);
+      //printf(" %i ", array[i]);
   }
-  printf("\n");
+  //printf("\n");
 
   int part_num = array_size/threads_num;
   struct SumArgs args[threads_num];
@@ -116,9 +116,9 @@ int main(int argc, char **argv) {
   for (uint32_t i = 0; i < threads_num; i++){
     args[i].array = array;
     args[i].begin = (i == 0) ? i*part_num : i*part_num + 1;
-    printf ("args[i].begin %i i=%i ", args[i].begin, i);
+    //printf ("args[i].begin %i i=%i ", args[i].begin, i);
     args[i].end = (i == threads_num - 1) ? array_size : (i + 1)*part_num;
-    printf ("args[i].end %i i=%i ", args[i].end, i);
+    //printf ("args[i].end %i i=%i ", args[i].end, i);
   }
   
   struct timeval start_time;
@@ -135,9 +135,9 @@ int main(int argc, char **argv) {
   for (uint32_t i = 0; i < threads_num; i++) {
     int sum = 0;
     pthread_join(threads[i], (void **)&sum);
-    printf("sum %i i= %i\n", sum, i);
+    //printf("sum %i i= %i\n", sum, i);
     total_sum += sum;
-    printf("total_sum %i\n", total_sum);
+    //printf("total_sum %i\n", total_sum);
   }
 
   struct timeval finish_time;
