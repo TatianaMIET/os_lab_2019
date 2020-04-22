@@ -16,7 +16,13 @@ struct SumArgs {
 
 int Sum(const struct SumArgs *args) {
   int sum = 0;
-  // TODO: your code here 
+  int i = (*args).begin;
+
+  while(i <= (*args).end){
+      sum += (*args).array[i];
+      i++;
+  }
+  
   return sum;
 }
 
@@ -97,10 +103,17 @@ int main(int argc, char **argv) {
   int *array = malloc(sizeof(int) * array_size);
   GenerateArray(array, array_size, seed);
 
-
+  int part_num = array_size/threads_num;
   struct SumArgs args[threads_num];
+  
+  for (uint32_t i = 0; i < threads_num; i++){
+    args[i].array = array;
+    args[i].begin = i*part_num;
+    args[i].end = (i == threads_num - 1) ? array_size : (i + 1)*part_num;
+  }
+  
   for (uint32_t i = 0; i < threads_num; i++) {
-    if (pthread_create(&threads[i], NULL, ThreadSum, (void *)&args)) {
+    if (pthread_create(&threads[i], NULL, ThreadSum, (void *)&args[i])) {
       printf("Error: pthread_create failed!\n");
       return 1;
     }
