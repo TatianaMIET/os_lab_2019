@@ -31,9 +31,9 @@ int ModFakt(struct FaktArgs *args) {
   for (i = 0; i < p; i++){
       pthread_mutex_lock(&mut);
       c = (c * n) % m;
-      printf("c= %i", c);
+      //printf("c= %i\n", c);
       n++;
-      printf("n= %i", n);
+      //printf("n= %i\n", n);
       
       (*args).next = n;
       (*args).current = c;
@@ -125,8 +125,7 @@ int main(int argc, char **argv) {
   args.next = 2;
   args.mod = mod;
   args.faktorial = faktorial;
-  args.part = threads_num/faktorial;
-
+  args.part = faktorial/threads_num;
 
   for (uint32_t i = 0; i < threads_num; i++) {
     if (pthread_create(&threads[i], NULL, ThreadFakt, (void *)&(args))) {
@@ -136,10 +135,13 @@ int main(int argc, char **argv) {
   }
 
    for (uint32_t i = 0; i < threads_num; i++) {
-    pthread_join(threads[i], NULL); 
+    if (pthread_join(threads[i], NULL) != 0) {
+        perror("pthread_join");
+        exit(1);
+    }
   }
 
 
-  printf("mod faktorial %i", args.current);
+  printf("mod faktorial %i\n", args.current);
   exit(0);
 }
