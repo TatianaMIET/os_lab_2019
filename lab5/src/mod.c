@@ -3,8 +3,6 @@
 #include <stdlib.h>
 #include <stdbool.h>
 
-#include <sys/time.h>
-
 #include <pthread.h>
 #include <getopt.h>
 
@@ -33,8 +31,10 @@ int ModFakt(struct FaktArgs *args) {
   for (i = 0; i < p; i++){
       pthread_mutex_lock(&mut);
       c = (c * n) % m;
+      printf("c= %i", c);
       n++;
-
+      printf("n= %i", n);
+      
       (*args).next = n;
       (*args).current = c;
       if (n > f) {
