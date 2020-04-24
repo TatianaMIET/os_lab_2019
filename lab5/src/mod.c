@@ -8,24 +8,40 @@
 #include <pthread.h>
 #include <getopt.h>
 
+
+pthread_mutex_t mut = PTHREAD_MUTEX_INITIALIZER;
+
 struct FaktArgs {
 
-  uint32_t threads_num;
+  uint32_t faktorial;
   uint32_t mod;
   uint32_t current;
   uint32_t next;
+  uint32_t part;
 
 };
 
-int ModFakt(const struct FaktArgs *args) {
+int ModFakt(struct FaktArgs *args) {
   
   uint32_t m = (*args).mod;
-  uint32_t th = (*args).threads_num;
+  uint32_t f = (*args).faktorial;
   uint32_t c = (*args).current;
   uint32_t n = (*args).next;
+  uint32_t p = (*args).part;
 
+  uint32_t i;
+  for (i = 0; i < p; i++){
+      pthread_mutex_lock(&mut);
+      c = (c * n) % m;
+      n++;
 
-
+      (*args).next = n;
+      (*args).current = c;
+      if (n > f) {
+          break;
+      }
+    pthread_mutex_unlock(&mut);
+  }
   return 0;
 }
 
@@ -33,8 +49,6 @@ void *ThreadFakt(void *args) {
   struct FaktArgs *fakt_args = (struct FaktArgs *)args;
   return (void *)(size_t)ModFakt(fakt_args);
 }
-
-
 
 int main(int argc, char **argv) {
 
@@ -108,18 +122,24 @@ int main(int argc, char **argv) {
 
   struct FaktArgs args;
   args.current = 1;
-  args.mod = mod;
   args.next = 2;
-  args.threads_num = threads_num;
+  args.mod = mod;
+  args.faktorial = faktorial;
+  args.part = threads_num/faktorial;
 
 
-    for (uint32_t i = 0; i < threads_num; i++) {
+  for (uint32_t i = 0; i < threads_num; i++) {
     if (pthread_create(&threads[i], NULL, ThreadFakt, (void *)&(args))) {
       printf("Error: pthread_create failed!\n");
       return 1;
     }
-
-    
   }
 
+   for (uint32_t i = 0; i < threads_num; i++) {
+    pthread_join(threads[i], NULL); 
+  }
+
+
+  printf("mod faktorial %i", args.current);
+  exit(0);
 }
