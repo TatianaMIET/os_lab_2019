@@ -8,15 +8,40 @@
 #include <pthread.h>
 #include <getopt.h>
 
+struct FaktArgs {
 
+  uint32_t threads_num;
+  uint32_t mod;
+  uint32_t current;
+  uint32_t next;
+
+};
+
+int ModFakt(const struct FaktArgs *args) {
+  
+  uint32_t m = (*args).mod;
+  uint32_t th = (*args).threads_num;
+  uint32_t c = (*args).current;
+  uint32_t n = (*args).next;
+
+
+
+  return 0;
+}
+
+void *ThreadFakt(void *args) {
+  struct FaktArgs *fakt_args = (struct FaktArgs *)args;
+  return (void *)(size_t)ModFakt(fakt_args);
+}
 
 
 
 int main(int argc, char **argv) {
 
-  uint32_t threads_num = 0;
   uint32_t faktorial = 0;
+  uint32_t threads_num = 0;
   uint32_t mod = 0;
+
   pthread_t threads[threads_num];
 
    while (true) {
@@ -81,6 +106,20 @@ int main(int argc, char **argv) {
     return 1;
   }
 
+  struct FaktArgs args;
+  args.current = 1;
+  args.mod = mod;
+  args.next = 2;
+  args.threads_num = threads_num;
 
-  
+
+    for (uint32_t i = 0; i < threads_num; i++) {
+    if (pthread_create(&threads[i], NULL, ThreadFakt, (void *)&(args))) {
+      printf("Error: pthread_create failed!\n");
+      return 1;
+    }
+
+    
+  }
+
 }
