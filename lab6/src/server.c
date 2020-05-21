@@ -163,11 +163,13 @@ int main(int argc, char **argv) {
       fprintf(stdout, "Receive: %llu %llu %llu\n", begin, end, mod);
 
       struct FactorialArgs args[tnum];
+      uint64_t dx = (end - begin)/tnum;
+
       for (uint32_t i = 0; i < tnum; i++) {
-        // TODO: parallel somehow
-        args[i].begin = 1;
-        args[i].end = 1;
-        args[i].mod = mod;
+          
+        args[i].begin = begin + i*dx;
+        args[i].end   = (i == (tnum - 1)) ? end : begin + (i+1)*dx;
+        args[i].mod   = mod;
 
         if (pthread_create(&threads[i], NULL, ThreadFactorial,
                            (void *)&args[i])) {
