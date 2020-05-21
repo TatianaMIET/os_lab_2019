@@ -67,7 +67,7 @@ struct Server* readServers(char* servers, int* servers_num){
 int main(int argc, char **argv) {
   uint64_t k = -1;
   uint64_t mod = -1;
-  char servers[255] = {'\0'};
+  char servers[255] = {'\0'}; //max length of file or directory
 
   while (true) {
     int current_optind = optind ? optind : 1;
