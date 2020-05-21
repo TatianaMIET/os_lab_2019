@@ -68,16 +68,19 @@ int main(int argc, char **argv) {
     case 0: {
       switch (option_index) {
       case 0:
-        ConvertStringToUI64(optarg, &k);
-        // TODO: your code here
+        if (!ConvertStringToUI64(optarg, &k)){
+            k=-1;
+        }
         break;
       case 1:
-        ConvertStringToUI64(optarg, &mod);
-        // TODO: your code here
+        if (!ConvertStringToUI64(optarg, &mod)){
+            mod=-1;
+        }
         break;
       case 2:
-        // TODO: your code here
-        memcpy(servers, optarg, strlen(optarg));
+        if (strlen(optarg) != 0){
+            memcpy(servers, optarg, strlen(optarg));
+        }
         break;
       default:
         printf("Index %d is out of options\n", option_index);
@@ -149,6 +152,7 @@ int main(int argc, char **argv) {
       fprintf(stderr, "Recieve failed\n");
       exit(1);
     }
+
 
     // TODO: from one server
     // unite results
