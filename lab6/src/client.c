@@ -45,10 +45,29 @@ bool ConvertStringToUI64(const char *str, uint64_t *val) {
   return true;
 }
 
+struct Server* readServers(char* servers, int* servers_num){
+    *servers_num = 0;
+
+    FILE* file;
+    file = fopen(servers, "r");
+    fscanf(file, "%d\n", servers_num);
+    struct Server* to = malloc(sizeof(struct Server) * *servers_num);
+
+    printf("\n Servers:\n");
+    for(int i = 0; i < *servers_num; i++)
+    {
+        fscanf(file, "%s %d\n", to[i].ip, &to[i].port);
+        printf("\t%s:%d\n", to[i].ip, to[i].port);
+    }
+    fclose(file);
+
+    return to;
+}
+
 int main(int argc, char **argv) {
   uint64_t k = -1;
   uint64_t mod = -1;
-  char servers[255] = {'\0'}; // TODO: explain why 255
+  char servers[255] = {'\0'};
 
   while (true) {
     int current_optind = optind ? optind : 1;
@@ -101,14 +120,12 @@ int main(int argc, char **argv) {
     return 1;
   }
 
-  // TODO: for one server here, rewrite with servers from file
-  unsigned int servers_num = 1;
-  struct Server *to = malloc(sizeof(struct Server) * servers_num);
-  // TODO: delete this and parallel work between servers
-  to[0].port = 20001;
-  memcpy(to[0].ip, "127.0.0.1", sizeof("127.0.0.1"));
+    int servers_num;
+    struct Server* to = readServers(servers, &servers_num);
 
-  // TODO: work continiously, rewrite to make parallel
+    
+    int* sck = malloc(sizeof(int) * servers_num);
+
   for (int i = 0; i < servers_num; i++) {
     struct hostent *hostname = gethostbyname(to[i].ip);
     if (hostname == NULL) {
@@ -121,47 +138,49 @@ int main(int argc, char **argv) {
     server.sin_port = htons(to[i].port);
     server.sin_addr.s_addr = *((unsigned long *)hostname->h_addr);
 
-    int sck = socket(AF_INET, SOCK_STREAM, 0);
-    if (sck < 0) {
+    sck[i] = socket(AF_INET, SOCK_STREAM, 0);
+    if (sck[i] < 0) {
       fprintf(stderr, "Socket creation failed!\n");
       exit(1);
     }
 
-    if (connect(sck, (struct sockaddr *)&server, sizeof(server)) < 0) {
+    if (connect(sck[i], (struct sockaddr *)&server, sizeof(server)) < 0) {
       fprintf(stderr, "Connection failed\n");
       exit(1);
     }
 
-    // TODO: for one server
-    // parallel between servers
-    uint64_t begin = 1;
-    uint64_t end = k;
+    uint64_t begin = i*k/servers_num + 1;
+    uint64_t end = (i == (servers_num-1)) ? k + 1 : (i+1)*k/servers_num + 1;
 
     char task[sizeof(uint64_t) * 3];
     memcpy(task, &begin, sizeof(uint64_t));
     memcpy(task + sizeof(uint64_t), &end, sizeof(uint64_t));
     memcpy(task + 2 * sizeof(uint64_t), &mod, sizeof(uint64_t));
 
-    if (send(sck, task, sizeof(task), 0) < 0) {
+    if (send(sck[i], task, sizeof(task), 0) < 0) {
       fprintf(stderr, "Send failed\n");
       exit(1);
     }
+  }
 
+    uint64_t total = 0;
+
+    for (int i = 0; i < servers_num; i++) {
     char response[sizeof(uint64_t)];
-    if (recv(sck, response, sizeof(response), 0) < 0) {
+    if (recv(sck[i], response, sizeof(response), 0) < 0) {
       fprintf(stderr, "Recieve failed\n");
       exit(1);
     }
 
-
-    // TODO: from one server
-    // unite results
     uint64_t answer = 0;
     memcpy(&answer, response, sizeof(uint64_t));
-    printf("answer: %llu\n", answer);
+    total = MultModulo(total, answer, mod);
 
-    close(sck);
+    close(sck[i]);
   }
+
+    printf("total: %llu\n", total);
+
   free(to);
 
   return 0;
