@@ -8,7 +8,7 @@ server : server.o
 	$(CC) -o server -lpthread server.o
 
 client : client.o
-    $(CC) -o client client.o
+	$(CC) -o client client.o
 
 server.o : 
 	$(CC) -o server.o -c -std=c99 server.c $(CFLAGS)

@@ -150,7 +150,7 @@ int main(int argc, char **argv) {
     }
 
     uint64_t begin = i*k/servers_num + 1;
-    uint64_t end = (i == (servers_num-1)) ? k + 1 : (i+1)*k/servers_num + 1;
+    uint64_t end = (i == (servers_num-1)) ? k : (i+1)*k/servers_num;
 
     char task[sizeof(uint64_t) * 3];
     memcpy(task, &begin, sizeof(uint64_t));
